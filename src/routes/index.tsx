@@ -1,29 +1,44 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Nav } from "@/components/site/Nav";
+import { Hero } from "@/components/site/Hero";
+import { Features } from "@/components/site/Features";
+import { AITools } from "@/components/site/AITools";
+import { Transformations } from "@/components/site/Transformations";
+import { Plans } from "@/components/site/Plans";
+import { Trainers } from "@/components/site/Trainers";
+import { Gallery } from "@/components/site/Gallery";
+import { Reviews } from "@/components/site/Reviews";
+import { Contact } from "@/components/site/Contact";
+import { Footer } from "@/components/site/Footer";
+import { FloatingWA } from "@/components/site/FloatingWA";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Your App" },
-      { name: "description", content: "Replace this with a one-sentence description of your app." },
-      { property: "og:title", content: "Your App" },
-      { property: "og:description", content: "Replace this with a one-sentence description of your app." },
+      { title: "K Fit Gym — Transform Your Body, Transform Your Life" },
+      { name: "description", content: "Ultra-premium fitness in your city. Elite trainers, AI diet planner, calorie & macro tools. Join K Fit Gym today." },
+      { property: "og:title", content: "K Fit Gym — Transform Your Body, Transform Your Life" },
+      { property: "og:description", content: "Elite trainers, AI nutrition, world-class equipment." },
     ],
   }),
-  component: Index,
+  component: Home,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+function Home() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <main className="relative overflow-x-hidden">
+      <Nav />
+      <Hero />
+      <Features />
+      <AITools />
+      <Transformations />
+      <Plans />
+      <Trainers />
+      <Gallery />
+      <Reviews />
+      <Contact />
+      <Footer />
+      <FloatingWA />
+    </main>
   );
 }
