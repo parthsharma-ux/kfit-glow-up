@@ -51,11 +51,11 @@
   --popover: oklch(0.18 0.01 270);
   --popover-foreground: oklch(0.97 0.005 270);
 
-  /* Red neon primary */
-  --primary: oklch(0.62 0.24 25);
+  /* Red neon primary - muted */
+  --primary: oklch(0.52 0.17 25);
   --primary-foreground: oklch(0.98 0 0);
-  --neon: oklch(0.68 0.27 25);
-  --neon-soft: oklch(0.55 0.22 25 / 0.4);
+  --neon: oklch(0.56 0.18 25);
+  --neon-soft: oklch(0.48 0.15 25 / 0.3);
 
   --secondary: oklch(0.22 0.01 270);
   --secondary-foreground: oklch(0.97 0 0);
