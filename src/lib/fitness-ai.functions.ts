@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { generateText, Output } from "ai";
+import { generateText } from "ai";
 import { z } from "zod";
 
 const DietInput = z.object({
@@ -50,14 +50,36 @@ Return realistic Indian-friendly meals with portions. Macros must sum near the c
 Provide 4-5 concrete food items per meal, 3-4 actionable tips.`;
 
     try {
-      const { experimental_output } = await generateText({
+      const { text } = await generateText({
         model: gateway("google/gemini-3-flash-preview"),
-        experimental_output: Output.object({ schema: DietSchema }),
-        prompt,
+        prompt: `${prompt}
+
+Respond with ONLY valid JSON (no markdown, no commentary) matching exactly this shape:
+{
+  "calories": number,
+  "waterLiters": number,
+  "macros": { "proteinG": number, "carbsG": number, "fatsG": number },
+  "meals": {
+    "breakfast": string[],
+    "lunch": string[],
+    "dinner": string[],
+    "snacks": string[]
+  },
+  "tips": string[]
+}
+Use raw numbers without units or thousands separators.`,
       });
-      return experimental_output;
+
+      let cleaned = text.replace(/^```json\s*/im, "").replace(/^```\s*/im, "").replace(/```\s*$/im, "").trim();
+      const start = cleaned.indexOf("{");
+      const end = cleaned.lastIndexOf("}");
+      if (start !== -1 && end > start) cleaned = cleaned.slice(start, end + 1);
+
+      const parsed = JSON.parse(cleaned);
+      return DietSchema.parse(parsed);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
+      console.error("generateDietPlan error:", msg);
       if (msg.includes("429")) throw new Error("AI is busy. Try again in a moment.");
       if (msg.includes("402")) throw new Error("AI credits exhausted. Please add credits.");
       throw new Error("Could not generate plan. Please try again.");
