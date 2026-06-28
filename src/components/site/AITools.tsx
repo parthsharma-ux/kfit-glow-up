@@ -162,13 +162,13 @@ function DietPlanner() {
             <option value="vegan">Vegan</option>
           </select>
         </Field>
-        <button disabled={loading} className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-bold uppercase tracking-wider text-primary-foreground shadow-[var(--shadow-neon)] transition-all disabled:opacity-60">
-          {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Generating…</> : <><Sparkles className="h-4 w-4" /> Generate My Diet</>}
+        <button type="submit" disabled={loading} className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-bold uppercase tracking-wider text-primary-foreground shadow-[var(--shadow-neon)] transition-all outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:opacity-60">
+          {loading ? <><Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> Generating…</> : <><Sparkles className="h-4 w-4" aria-hidden="true" /> Generate My Diet</>}
         </button>
-        {error && <p className="text-sm text-destructive">{error}</p>}
+        {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
       </form>
 
-      <div className="rounded-2xl bg-background/40 p-5 ring-1 ring-border min-h-[420px]">
+      <div role="region" aria-live="polite" aria-busy={loading} aria-label="Your diet plan results" className="rounded-2xl bg-background/40 p-5 ring-1 ring-border min-h-[420px]">
         {!result && !loading && (
           <div className="flex h-full flex-col items-center justify-center text-center text-muted-foreground">
             <Sparkles className="mb-3 h-8 w-8 text-primary" />
