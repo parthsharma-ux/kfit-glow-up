@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { cloneElement, isValidElement, useId, useRef, useState, type ReactElement } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { generateDietPlan } from "@/lib/fitness-ai.functions";
 import { Sparkles, Calculator, Scale, PieChart, Activity, Loader2 } from "lucide-react";
