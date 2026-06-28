@@ -15,36 +15,74 @@ const tabs: { key: Tab; label: string; icon: typeof Sparkles }[] = [
 
 export function AITools() {
   const [tab, setTab] = useState<Tab>("diet");
+  const tabRefs = useRef<Record<Tab, HTMLButtonElement | null>>({
+    diet: null, calorie: null, bmi: null, macro: null, bodyfat: null,
+  });
+
+  function onTabKeyDown(e: React.KeyboardEvent<HTMLButtonElement>, idx: number) {
+    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft" && e.key !== "Home" && e.key !== "End") return;
+    e.preventDefault();
+    const last = tabs.length - 1;
+    const nextIdx =
+      e.key === "ArrowRight" ? (idx === last ? 0 : idx + 1) :
+      e.key === "ArrowLeft" ? (idx === 0 ? last : idx - 1) :
+      e.key === "Home" ? 0 : last;
+    const nextKey = tabs[nextIdx].key;
+    setTab(nextKey);
+    tabRefs.current[nextKey]?.focus();
+  }
 
   return (
-    <section id="ai-tools" className="section-pad relative">
+    <section id="ai-tools" aria-labelledby="ai-tools-heading" className="section-pad relative">
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-primary/5 to-transparent" />
       <div className="mx-auto max-w-7xl px-4">
         <div className="mb-12 max-w-2xl">
           <p className="text-xs uppercase tracking-[0.3em] text-primary mb-3">AI Fitness Suite</p>
-          <h2 className="font-display text-4xl tracking-tight sm:text-6xl gradient-text">Your personal AI coach</h2>
+          <h2 id="ai-tools-heading" className="font-display text-4xl tracking-tight sm:text-6xl gradient-text">Your personal AI coach</h2>
           <p className="mt-4 text-muted-foreground">Five tools powered by advanced AI. Free for everyone — no signup required.</p>
         </div>
 
         {/* Tabs */}
-        <div className="mb-8 flex flex-wrap gap-2">
-          {tabs.map(({ key, label, icon: Icon }) => (
-            <button
-              key={key}
-              onClick={() => setTab(key)}
-              className={`inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition-all ${
-                tab === key
-                  ? "bg-primary text-primary-foreground shadow-[var(--shadow-neon)]"
-                  : "glass hover:border-primary/40"
-              }`}
-            >
-              <Icon className="h-4 w-4" />
-              {label}
-            </button>
-          ))}
+        <div
+          role="tablist"
+          aria-label="AI fitness tools"
+          aria-orientation="horizontal"
+          className="mb-8 flex flex-wrap gap-2"
+        >
+          {tabs.map(({ key, label, icon: Icon }, idx) => {
+            const selected = tab === key;
+            return (
+              <button
+                key={key}
+                ref={(el) => { tabRefs.current[key] = el; }}
+                id={`ai-tab-${key}`}
+                type="button"
+                role="tab"
+                aria-selected={selected}
+                aria-controls={`ai-panel-${key}`}
+                tabIndex={selected ? 0 : -1}
+                onClick={() => setTab(key)}
+                onKeyDown={(e) => onTabKeyDown(e, idx)}
+                className={`inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition-all outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+                  selected
+                    ? "bg-primary text-primary-foreground shadow-[var(--shadow-neon)]"
+                    : "glass hover:border-primary/40"
+                }`}
+              >
+                <Icon className="h-4 w-4" aria-hidden="true" />
+                {label}
+              </button>
+            );
+          })}
         </div>
 
-        <div className="glass-strong rounded-3xl p-6 sm:p-10">
+        <div
+          role="tabpanel"
+          id={`ai-panel-${tab}`}
+          aria-labelledby={`ai-tab-${tab}`}
+          tabIndex={0}
+          className="glass-strong rounded-3xl p-6 sm:p-10 outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+        >
           {tab === "diet" && <DietPlanner />}
           {tab === "calorie" && <CalorieCalc />}
           {tab === "bmi" && <BMICalc />}
@@ -58,11 +96,18 @@ export function AITools() {
 
 /* ---------- Shared form bits ---------- */
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  const id = useId();
+  const child =
+    isValidElement(children)
+      ? cloneElement(children as ReactElement<{ id?: string; "aria-label"?: string }>, { id, "aria-label": label })
+      : children;
   return (
-    <label className="block">
-      <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
-      {children}
-    </label>
+    <div className="block">
+      <label htmlFor={id} className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </label>
+      {child}
+    </div>
   );
 }
 const inputCls =
