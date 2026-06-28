@@ -19,7 +19,11 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Ultra-premium fitness in your city. Elite trainers, AI diet planner, calorie & macro tools. Join K Fit Gym today." },
       { property: "og:title", content: "K Fit Gym — Transform Your Body, Transform Your Life" },
       { property: "og:description", content: "Elite trainers, AI nutrition, world-class equipment." },
+      { property: "og:url", content: "/" },
+      { name: "twitter:title", content: "K Fit Gym — Transform Your Body, Transform Your Life" },
+      { name: "twitter:description", content: "Elite trainers, AI nutrition, world-class equipment." },
     ],
+    links: [{ rel: "canonical", href: "/" }],
   }),
   component: Home,
 });
