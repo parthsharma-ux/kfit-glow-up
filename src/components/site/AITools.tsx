@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { cloneElement, isValidElement, useId, useRef, useState, type ReactElement } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { generateDietPlan } from "@/lib/fitness-ai.functions";
 import { Sparkles, Calculator, Scale, PieChart, Activity, Loader2 } from "lucide-react";
@@ -15,36 +15,74 @@ const tabs: { key: Tab; label: string; icon: typeof Sparkles }[] = [
 
 export function AITools() {
   const [tab, setTab] = useState<Tab>("diet");
+  const tabRefs = useRef<Record<Tab, HTMLButtonElement | null>>({
+    diet: null, calorie: null, bmi: null, macro: null, bodyfat: null,
+  });
+
+  function onTabKeyDown(e: React.KeyboardEvent<HTMLButtonElement>, idx: number) {
+    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft" && e.key !== "Home" && e.key !== "End") return;
+    e.preventDefault();
+    const last = tabs.length - 1;
+    const nextIdx =
+      e.key === "ArrowRight" ? (idx === last ? 0 : idx + 1) :
+      e.key === "ArrowLeft" ? (idx === 0 ? last : idx - 1) :
+      e.key === "Home" ? 0 : last;
+    const nextKey = tabs[nextIdx].key;
+    setTab(nextKey);
+    tabRefs.current[nextKey]?.focus();
+  }
 
   return (
-    <section id="ai-tools" className="section-pad relative">
+    <section id="ai-tools" aria-labelledby="ai-tools-heading" className="section-pad relative">
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-primary/5 to-transparent" />
       <div className="mx-auto max-w-7xl px-4">
         <div className="mb-12 max-w-2xl">
           <p className="text-xs uppercase tracking-[0.3em] text-primary mb-3">AI Fitness Suite</p>
-          <h2 className="font-display text-4xl tracking-tight sm:text-6xl gradient-text">Your personal AI coach</h2>
+          <h2 id="ai-tools-heading" className="font-display text-4xl tracking-tight sm:text-6xl gradient-text">Your personal AI coach</h2>
           <p className="mt-4 text-muted-foreground">Five tools powered by advanced AI. Free for everyone — no signup required.</p>
         </div>
 
         {/* Tabs */}
-        <div className="mb-8 flex flex-wrap gap-2">
-          {tabs.map(({ key, label, icon: Icon }) => (
-            <button
-              key={key}
-              onClick={() => setTab(key)}
-              className={`inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition-all ${
-                tab === key
-                  ? "bg-primary text-primary-foreground shadow-[var(--shadow-neon)]"
-                  : "glass hover:border-primary/40"
-              }`}
-            >
-              <Icon className="h-4 w-4" />
-              {label}
-            </button>
-          ))}
+        <div
+          role="tablist"
+          aria-label="AI fitness tools"
+          aria-orientation="horizontal"
+          className="mb-8 flex flex-wrap gap-2"
+        >
+          {tabs.map(({ key, label, icon: Icon }, idx) => {
+            const selected = tab === key;
+            return (
+              <button
+                key={key}
+                ref={(el) => { tabRefs.current[key] = el; }}
+                id={`ai-tab-${key}`}
+                type="button"
+                role="tab"
+                aria-selected={selected}
+                aria-controls={`ai-panel-${key}`}
+                tabIndex={selected ? 0 : -1}
+                onClick={() => setTab(key)}
+                onKeyDown={(e) => onTabKeyDown(e, idx)}
+                className={`inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition-all outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
+                  selected
+                    ? "bg-primary text-primary-foreground shadow-[var(--shadow-neon)]"
+                    : "glass hover:border-primary/40"
+                }`}
+              >
+                <Icon className="h-4 w-4" aria-hidden="true" />
+                {label}
+              </button>
+            );
+          })}
         </div>
 
-        <div className="glass-strong rounded-3xl p-6 sm:p-10">
+        <div
+          role="tabpanel"
+          id={`ai-panel-${tab}`}
+          aria-labelledby={`ai-tab-${tab}`}
+          tabIndex={0}
+          className="glass-strong rounded-3xl p-6 sm:p-10 outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+        >
           {tab === "diet" && <DietPlanner />}
           {tab === "calorie" && <CalorieCalc />}
           {tab === "bmi" && <BMICalc />}
@@ -58,11 +96,18 @@ export function AITools() {
 
 /* ---------- Shared form bits ---------- */
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  const id = useId();
+  const child =
+    isValidElement(children)
+      ? cloneElement(children as ReactElement<{ id?: string; "aria-label"?: string }>, { id, "aria-label": label })
+      : children;
   return (
-    <label className="block">
-      <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
-      {children}
-    </label>
+    <div className="block">
+      <label htmlFor={id} className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </label>
+      {child}
+    </div>
   );
 }
 const inputCls =
@@ -89,7 +134,7 @@ function DietPlanner() {
 
   return (
     <div className="grid gap-8 lg:grid-cols-2">
-      <form onSubmit={onSubmit} className="space-y-4">
+      <form onSubmit={onSubmit} aria-busy={loading} className="space-y-4">
         <h3 className="font-display text-2xl tracking-wide">Tell us about you</h3>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Age"><input type="number" className={inputCls} value={form.age} onChange={(e) => setForm({ ...form, age: +e.target.value })} /></Field>
@@ -117,13 +162,13 @@ function DietPlanner() {
             <option value="vegan">Vegan</option>
           </select>
         </Field>
-        <button disabled={loading} className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-bold uppercase tracking-wider text-primary-foreground shadow-[var(--shadow-neon)] transition-all disabled:opacity-60">
-          {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Generating…</> : <><Sparkles className="h-4 w-4" /> Generate My Diet</>}
+        <button type="submit" disabled={loading} className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-bold uppercase tracking-wider text-primary-foreground shadow-[var(--shadow-neon)] transition-all outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:opacity-60">
+          {loading ? <><Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> Generating…</> : <><Sparkles className="h-4 w-4" aria-hidden="true" /> Generate My Diet</>}
         </button>
-        {error && <p className="text-sm text-destructive">{error}</p>}
+        {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
       </form>
 
-      <div className="rounded-2xl bg-background/40 p-5 ring-1 ring-border min-h-[420px]">
+      <div role="region" aria-live="polite" aria-busy={loading} aria-label="Your diet plan results" className="rounded-2xl bg-background/40 p-5 ring-1 ring-border min-h-[420px]">
         {!result && !loading && (
           <div className="flex h-full flex-col items-center justify-center text-center text-muted-foreground">
             <Sparkles className="mb-3 h-8 w-8 text-primary" />
