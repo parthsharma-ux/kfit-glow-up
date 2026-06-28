@@ -134,7 +134,7 @@ function DietPlanner() {
 
   return (
     <div className="grid gap-8 lg:grid-cols-2">
-      <form onSubmit={onSubmit} className="space-y-4">
+      <form onSubmit={onSubmit} aria-busy={loading} className="space-y-4">
         <h3 className="font-display text-2xl tracking-wide">Tell us about you</h3>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Age"><input type="number" className={inputCls} value={form.age} onChange={(e) => setForm({ ...form, age: +e.target.value })} /></Field>
