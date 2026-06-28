@@ -107,11 +107,11 @@
 }
 @utility neon-text {
   color: var(--neon);
-  text-shadow: 0 0 18px oklch(0.62 0.24 25 / 0.6), 0 0 4px oklch(0.62 0.24 25 / 0.9);
+  text-shadow: 0 0 10px oklch(0.56 0.18 25 / 0.25), 0 0 2px oklch(0.56 0.18 25 / 0.4);
 }
 @utility neon-border {
-  border: 1px solid oklch(0.62 0.24 25 / 0.6);
-  box-shadow: var(--shadow-neon), inset 0 0 20px oklch(0.62 0.24 25 / 0.1);
+  border: 1px solid oklch(0.56 0.18 25 / 0.35);
+  box-shadow: var(--shadow-neon), inset 0 0 12px oklch(0.56 0.18 25 / 0.06);
 }
 @utility gradient-text {
   background: linear-gradient(135deg, #fff 0%, oklch(0.8 0.05 25) 50%, var(--neon) 100%);
