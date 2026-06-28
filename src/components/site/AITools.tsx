@@ -66,7 +66,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 const inputCls =
-  "w-full rounded-lg bg-input border border-border px-3.5 py-2.5 text-sm outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/30";
+  "w-full rounded-lg bg-input border border-border px-3.5 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/30 [&>option]:bg-background [&>option]:text-foreground";
 
 /* ---------- AI Diet Planner ---------- */
 function DietPlanner() {
