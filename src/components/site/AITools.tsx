@@ -66,7 +66,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 const inputCls =
-  "w-full rounded-lg bg-input border border-border px-3.5 py-2.5 text-sm text-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/30 [&>option]:bg-background [&>option]:text-foreground";
+  "w-full rounded-lg bg-input border border-border px-3.5 py-3 sm:py-2.5 text-base sm:text-sm text-foreground font-medium outline-none transition-all [color-scheme:dark] focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background hover:border-primary/50 [&>option]:bg-background [&>option]:text-foreground [&>option:checked]:bg-primary/20 [&>option:checked]:text-foreground";
 
 /* ---------- AI Diet Planner ---------- */
 function DietPlanner() {
