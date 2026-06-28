@@ -124,8 +124,8 @@
 }
 
 @keyframes pulse-neon {
-  0%, 100% { box-shadow: 0 0 24px oklch(0.62 0.24 25 / 0.5), 0 0 6px oklch(0.62 0.24 25 / 0.7); }
-  50% { box-shadow: 0 0 48px oklch(0.62 0.24 25 / 0.7), 0 0 12px oklch(0.62 0.24 25 / 0.9); }
+  0%, 100% { box-shadow: 0 0 12px oklch(0.56 0.18 25 / 0.22), 0 0 4px oklch(0.56 0.18 25 / 0.35); }
+  50% { box-shadow: 0 0 24px oklch(0.56 0.18 25 / 0.32), 0 0 8px oklch(0.56 0.18 25 / 0.45); }
 }
 @keyframes float-y {
   0%, 100% { transform: translateY(0); }
