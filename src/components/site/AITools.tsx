@@ -136,12 +136,19 @@ function DietPlanner() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<Awaited<ReturnType<typeof generate>> | null>(null);
+  const errorRef = useRef<HTMLParagraphElement | null>(null);
 
   useEffect(() => {
     if (result && !loading) {
       resultRef.current?.focus();
     }
   }, [result, loading]);
+
+  useEffect(() => {
+    if (error) {
+      errorRef.current?.focus();
+    }
+  }, [error]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
