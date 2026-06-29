@@ -131,10 +131,17 @@ const inputCls =
 /* ---------- AI Diet Planner ---------- */
 function DietPlanner() {
   const generate = useServerFn(generateDietPlan);
+  const resultRef = useRef<HTMLDivElement | null>(null);
   const [form, setForm] = useState({ age: 28, weightKg: 72, heightCm: 175, gender: "male", goal: "muscle_gain", diet: "non_vegetarian" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<Awaited<ReturnType<typeof generate>> | null>(null);
+
+  useEffect(() => {
+    if (result && !loading) {
+      resultRef.current?.focus();
+    }
+  }, [result, loading]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
