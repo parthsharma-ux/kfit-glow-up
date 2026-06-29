@@ -190,7 +190,7 @@ function DietPlanner() {
         {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
       </form>
 
-      <div role="region" aria-live="polite" aria-busy={loading} aria-label="Your diet plan results" className="rounded-2xl bg-background/40 p-5 ring-1 ring-border min-h-[420px]">
+      <div ref={resultRef} role="region" aria-live="polite" aria-busy={loading} aria-label="Your diet plan results" tabIndex={0} className="rounded-2xl bg-background/40 p-5 ring-1 ring-border min-h-[420px] outline-none focus-visible:ring-2 focus-visible:ring-primary/40">
         {!result && !loading && (
           <div className="flex h-full flex-col items-center justify-center text-center text-muted-foreground">
             <Sparkles className="mb-3 h-8 w-8 text-primary" />
