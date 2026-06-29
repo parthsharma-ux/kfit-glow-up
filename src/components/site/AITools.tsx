@@ -15,9 +15,23 @@ const tabs: { key: Tab; label: string; icon: typeof Sparkles }[] = [
 
 export function AITools() {
   const [tab, setTab] = useState<Tab>("diet");
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  const focusPanelAfterRender = useRef(false);
   const tabRefs = useRef<Record<Tab, HTMLButtonElement | null>>({
     diet: null, calorie: null, bmi: null, macro: null, bodyfat: null,
   });
+
+  useEffect(() => {
+    if (focusPanelAfterRender.current) {
+      focusPanelAfterRender.current = false;
+      panelRef.current?.focus();
+    }
+  }, [tab]);
+
+  function selectTab(nextKey: Tab) {
+    focusPanelAfterRender.current = true;
+    setTab(nextKey);
+  }
 
   function onTabKeyDown(e: React.KeyboardEvent<HTMLButtonElement>, idx: number) {
     if (e.key !== "ArrowRight" && e.key !== "ArrowLeft" && e.key !== "Home" && e.key !== "End") return;
@@ -28,7 +42,7 @@ export function AITools() {
       e.key === "ArrowLeft" ? (idx === 0 ? last : idx - 1) :
       e.key === "Home" ? 0 : last;
     const nextKey = tabs[nextIdx].key;
-    setTab(nextKey);
+    selectTab(nextKey);
     tabRefs.current[nextKey]?.focus();
   }
 
