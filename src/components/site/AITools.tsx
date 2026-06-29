@@ -1,4 +1,4 @@
-import { cloneElement, isValidElement, useId, useRef, useState, type ReactElement } from "react";
+import { cloneElement, isValidElement, useEffect, useId, useRef, useState, type ReactElement } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { generateDietPlan } from "@/lib/fitness-ai.functions";
 import { Sparkles, Calculator, Scale, PieChart, Activity, Loader2 } from "lucide-react";
@@ -15,9 +15,23 @@ const tabs: { key: Tab; label: string; icon: typeof Sparkles }[] = [
 
 export function AITools() {
   const [tab, setTab] = useState<Tab>("diet");
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  const focusPanelAfterRender = useRef(false);
   const tabRefs = useRef<Record<Tab, HTMLButtonElement | null>>({
     diet: null, calorie: null, bmi: null, macro: null, bodyfat: null,
   });
+
+  useEffect(() => {
+    if (focusPanelAfterRender.current) {
+      focusPanelAfterRender.current = false;
+      panelRef.current?.focus();
+    }
+  }, [tab]);
+
+  function selectTab(nextKey: Tab) {
+    focusPanelAfterRender.current = true;
+    setTab(nextKey);
+  }
 
   function onTabKeyDown(e: React.KeyboardEvent<HTMLButtonElement>, idx: number) {
     if (e.key !== "ArrowRight" && e.key !== "ArrowLeft" && e.key !== "Home" && e.key !== "End") return;
@@ -28,7 +42,7 @@ export function AITools() {
       e.key === "ArrowLeft" ? (idx === 0 ? last : idx - 1) :
       e.key === "Home" ? 0 : last;
     const nextKey = tabs[nextIdx].key;
-    setTab(nextKey);
+    selectTab(nextKey);
     tabRefs.current[nextKey]?.focus();
   }
 
@@ -61,7 +75,7 @@ export function AITools() {
                 aria-selected={selected}
                 aria-controls={`ai-panel-${key}`}
                 tabIndex={selected ? 0 : -1}
-                onClick={() => setTab(key)}
+                onClick={() => selectTab(key)}
                 onKeyDown={(e) => onTabKeyDown(e, idx)}
                 className={`inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition-all outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                   selected
@@ -77,6 +91,7 @@ export function AITools() {
         </div>
 
         <div
+          ref={panelRef}
           role="tabpanel"
           id={`ai-panel-${tab}`}
           aria-labelledby={`ai-tab-${tab}`}
@@ -116,10 +131,24 @@ const inputCls =
 /* ---------- AI Diet Planner ---------- */
 function DietPlanner() {
   const generate = useServerFn(generateDietPlan);
+  const resultRef = useRef<HTMLDivElement | null>(null);
   const [form, setForm] = useState({ age: 28, weightKg: 72, heightCm: 175, gender: "male", goal: "muscle_gain", diet: "non_vegetarian" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<Awaited<ReturnType<typeof generate>> | null>(null);
+  const errorRef = useRef<HTMLParagraphElement | null>(null);
+
+  useEffect(() => {
+    if (result && !loading) {
+      resultRef.current?.focus();
+    }
+  }, [result, loading]);
+
+  useEffect(() => {
+    if (error) {
+      errorRef.current?.focus();
+    }
+  }, [error]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -165,10 +194,10 @@ function DietPlanner() {
         <button type="submit" disabled={loading} className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-bold uppercase tracking-wider text-primary-foreground shadow-[var(--shadow-neon)] transition-all outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:opacity-60">
           {loading ? <><Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> Generating…</> : <><Sparkles className="h-4 w-4" aria-hidden="true" /> Generate My Diet</>}
         </button>
-        {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+        {error && <p ref={errorRef} role="alert" tabIndex={0} className="text-sm text-destructive outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded">{error}</p>}
       </form>
 
-      <div role="region" aria-live="polite" aria-busy={loading} aria-label="Your diet plan results" className="rounded-2xl bg-background/40 p-5 ring-1 ring-border min-h-[420px]">
+      <div ref={resultRef} role="region" aria-live="polite" aria-busy={loading} aria-label="Your diet plan results" tabIndex={0} className="rounded-2xl bg-background/40 p-5 ring-1 ring-border min-h-[420px] outline-none focus-visible:ring-2 focus-visible:ring-primary/40">
         {!result && !loading && (
           <div className="flex h-full flex-col items-center justify-center text-center text-muted-foreground">
             <Sparkles className="mb-3 h-8 w-8 text-primary" />
