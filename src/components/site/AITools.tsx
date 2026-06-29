@@ -194,7 +194,7 @@ function DietPlanner() {
         <button type="submit" disabled={loading} className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-bold uppercase tracking-wider text-primary-foreground shadow-[var(--shadow-neon)] transition-all outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:opacity-60">
           {loading ? <><Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> Generating…</> : <><Sparkles className="h-4 w-4" aria-hidden="true" /> Generate My Diet</>}
         </button>
-        {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+        {error && <p ref={errorRef} role="alert" tabIndex={0} className="text-sm text-destructive outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded">{error}</p>}
       </form>
 
       <div ref={resultRef} role="region" aria-live="polite" aria-busy={loading} aria-label="Your diet plan results" tabIndex={0} className="rounded-2xl bg-background/40 p-5 ring-1 ring-border min-h-[420px] outline-none focus-visible:ring-2 focus-visible:ring-primary/40">
