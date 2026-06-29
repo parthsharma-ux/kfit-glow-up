@@ -75,7 +75,7 @@ export function AITools() {
                 aria-selected={selected}
                 aria-controls={`ai-panel-${key}`}
                 tabIndex={selected ? 0 : -1}
-                onClick={() => setTab(key)}
+                onClick={() => selectTab(key)}
                 onKeyDown={(e) => onTabKeyDown(e, idx)}
                 className={`inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition-all outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                   selected
@@ -91,6 +91,7 @@ export function AITools() {
         </div>
 
         <div
+          ref={panelRef}
           role="tabpanel"
           id={`ai-panel-${tab}`}
           aria-labelledby={`ai-tab-${tab}`}
